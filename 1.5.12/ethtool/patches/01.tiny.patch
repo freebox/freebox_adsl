@@ -1,0 +1,82 @@
+--- ethtool-6/Makefile.in	2007-07-26 19:42:02.000000000 +0200
++++ src/Makefile.in	2008-10-16 06:40:01.000000000 +0200
+@@ -52,12 +52,7 @@
+ am__installdirs = "$(DESTDIR)$(sbindir)" "$(DESTDIR)$(man8dir)"
+ sbinPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
+ PROGRAMS = $(sbin_PROGRAMS)
+-am_ethtool_OBJECTS = ethtool.$(OBJEXT) amd8111e.$(OBJEXT) \
+-	de2104x.$(OBJEXT) e100.$(OBJEXT) e1000.$(OBJEXT) \
+-	fec_8xx.$(OBJEXT) ibm_emac.$(OBJEXT) ixgb.$(OBJEXT) \
+-	natsemi.$(OBJEXT) pcnet32.$(OBJEXT) realtek.$(OBJEXT) \
+-	tg3.$(OBJEXT) marvell.$(OBJEXT) vioc.$(OBJEXT) \
+-	smsc911x.$(OBJEXT)
++am_ethtool_OBJECTS = ethtool.$(OBJEXT)
+ ethtool_OBJECTS = $(am_ethtool_OBJECTS)
+ ethtool_LDADD = $(LDADD)
+ DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
+@@ -162,12 +157,7 @@
+ AM_CFLAGS = -Wall
+ man_MANS = ethtool.8
+ EXTRA_DIST = ethtool.8 ethtool.spec.in aclocal.m4 ChangeLog autogen.sh
+-ethtool_SOURCES = ethtool.c ethtool-copy.h ethtool-util.h	\
+-		  amd8111e.c de2104x.c e100.c e1000.c		\
+-		  fec_8xx.c ibm_emac.c ixgb.c natsemi.c		\
+-		  pcnet32.c realtek.c tg3.c marvell.c vioc.c	\
+-		  smsc911x.c
+-
++ethtool_SOURCES = ethtool.c ethtool-copy.h ethtool-util.h
+ all: ethtool-config.h
+ 	$(MAKE) $(AM_MAKEFLAGS) all-am
+ 
+--- ethtool-6/ethtool.c	2007-07-26 19:22:06.000000000 +0200
++++ src/ethtool.c	2008-10-16 06:40:48.000000000 +0200
+@@ -993,6 +993,7 @@
+ 	return 0;
+ }
+ 
++#if 0
+ static struct {
+ 	const char *name;
+ 	int (*func)(struct ethtool_drvinfo *info, struct ethtool_regs *regs);
+@@ -1016,6 +1017,7 @@
+         { "vioc", vioc_dump_regs },
+         { "smsc911x", smsc911x_dump_regs },
+ };
++#endif
+ 
+ static int dump_regs(struct ethtool_drvinfo *info, struct ethtool_regs *regs)
+ {
+@@ -1042,11 +1044,13 @@
+ 		fclose(f);
+ 	}
+ 
++#if 0
+ 	if (!gregs_dump_hex)
+ 		for (i = 0; i < ARRAY_SIZE(driver_list); i++)
+ 			if (!strncmp(driver_list[i].name, info->driver,
+ 				     ETHTOOL_BUSINFO_LEN))
+ 				return driver_list[i].func(info, regs);
++#endif
+ 
+ 	fprintf(stdout, "Offset\tValues\n");
+ 	fprintf(stdout, "--------\t-----");
+@@ -1062,17 +1066,18 @@
+ static int dump_eeprom(struct ethtool_drvinfo *info, struct ethtool_eeprom *ee)
+ {
+ 	int i;
+-
+ 	if (geeprom_dump_raw) {
+ 		fwrite(ee->data, 1, ee->len, stdout);
+ 		return 0;
+ 	}
+ 
++#if 0
+ 	if (!strncmp("natsemi", info->driver, ETHTOOL_BUSINFO_LEN)) {
+ 		return natsemi_dump_eeprom(info, ee);
+ 	} else if (!strncmp("tg3", info->driver, ETHTOOL_BUSINFO_LEN)) {
+ 		return tg3_dump_eeprom(info, ee);
+ 	}
++#endif
+ 
+ 	fprintf(stdout, "Offset\t\tValues\n");
+ 	fprintf(stdout, "------\t\t------");
